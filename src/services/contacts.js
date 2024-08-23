@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { ContactModels } from '../models/contacts.js';
 
 export const fullContacts = async (req, res) => {
@@ -18,10 +19,15 @@ export const fullContacts = async (req, res) => {
 export const oneContact = async (req, res, next) => {
   try {
     const { contactId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(contactId)) {
+      return res.status(400).send({ message: 'Invalid contact ID format' });
+    }
+
     const contact = await ContactModels.findById(contactId);
 
     if (contact === null) {
-      res.status(404).send({
+      return res.status(404).send({
         message: 'Contact not found',
       });
     }
