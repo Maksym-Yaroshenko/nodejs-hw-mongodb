@@ -6,7 +6,7 @@ const contactsSchema = new mongoose.Schema(
       required: true,
     },
     phoneNumber: {
-      type: String,
+      type: Number,
       required: true,
     },
     email: {
@@ -21,6 +21,7 @@ const contactsSchema = new mongoose.Schema(
     },
     isFavourite: {
       type: Boolean,
+      required: false,
       default: false,
     },
     contactType: {
