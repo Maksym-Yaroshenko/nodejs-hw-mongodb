@@ -46,7 +46,7 @@ export const contactModelsFindById = (contactId) => {
   return ContactModels.findById(contactId);
 };
 
-export const createContact = (payload) => {
+export const createContact = (payload, qqq, options = {}) => {
   return ContactModels.create(payload);
 };
 
@@ -59,7 +59,7 @@ export const updateContact = (contactId, payload, options = {}) => {
     new: true,
     upsert: true,
     includeResultMetadata: true,
-    versionKey: false,
+    // versionKey: false,
   });
 };
 
@@ -67,6 +67,6 @@ export const pumpingWithPatch = (contactId, payload, options = {}) => {
   return ContactModels.findByIdAndUpdate(contactId, payload, {
     new: true,
     includeResultMetadata: true,
-    versionKey: false,
+    // versionKey: false,
   });
 };

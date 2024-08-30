@@ -6,7 +6,7 @@ const contactsSchema = new mongoose.Schema(
       required: true,
     },
     phoneNumber: {
-      type: Number,
+      type: String,
       required: true,
     },
     email: {
@@ -31,7 +31,10 @@ const contactsSchema = new mongoose.Schema(
       default: 'personal',
     },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    versionKey: false,
+  },
 );
 
 const ContactModels = mongoose.model('Contact', contactsSchema);

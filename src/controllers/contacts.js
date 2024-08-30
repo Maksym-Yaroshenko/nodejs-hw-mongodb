@@ -86,11 +86,7 @@ export const deleteContactController = async (req, res, next) => {
     return next(createHttpError(404, 'Contact not found'));
   }
 
-  res.send({
-    status: 200,
-    message: `Successfully deleted contact with id ${contactId}`,
-    data: deletedContact,
-  });
+  res.status(204).send();
 };
 
 export const putContactController = async (req, res, next) => {
@@ -143,8 +139,16 @@ export const patchContactController = async (req, res, next) => {
 
   const updatedContact = await pumpingWithPatch(contactId, req.body);
 
-  if (updatedContact === null) {
-    return next(createHttpError(404, 'Contact not found'));
+  if (updatedContact.value === null) {
+    return next(
+      createHttpError(404, {
+        status: 404,
+        message: 'NotFoundError',
+        data: {
+          message: 'Contact not found',
+        },
+      }),
+    );
   }
 
   res.send({
