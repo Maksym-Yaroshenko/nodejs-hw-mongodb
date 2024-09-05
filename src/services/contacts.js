@@ -1,45 +1,36 @@
 // import mongoose from 'mongoose';
+import { SORT_ORDER } from '../constants/index.js';
 import { ContactModels } from '../models/contacts.js';
+import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 
-// export const fullContacts = async (req, res) => {
-//   const contacts = await ContactModels.find();
+export const contactModelsFind = async (
+  page = 1,
+  perPage = 10,
+  sortOrder = SORT_ORDER.ASD,
+  sortBy = '_id',
+) => {
+  const limit = perPage;
+  const skip = (page - 1) * perPage;
 
-//   res.send({
-//     status: 200,
-//     message: 'Successfully found contacts!',
-//     data: contacts,
-//   });
+  const contactsQuery = ContactModels.find();
 
-//   console.error(error);
-//   res.status(500).send('Something went wrong');
-// };
+  const [contactsCount, contacts] = await Promise.all([
+    ContactModels.countDocuments({}),
+    contactsQuery
+      .skip(skip)
+      .limit(limit)
+      .sort({ [sortBy]: sortOrder })
+      .exec(),
+  ]);
 
-// export const oneContact = async (req, res, next) => {
-//   const { contactId } = req.params;
+  const peginationData = calculatePaginationData(contactsCount, page, perPage);
 
-//   if (!mongoose.Types.ObjectId.isValid(contactId)) {
-//     return res.status(400).send({ message: 'Invalid contact ID format' });
-//   }
+  return {
+    data: contacts,
+    ...peginationData,
+  };
 
-//   const contact = await ContactModels.findById(contactId);
-
-//   if (contact === null) {
-//     return res.status(404).send({
-//       message: 'Contact not found',
-//     });
-//   }
-
-//   res.send({
-//     status: 200,
-//     message: `Successfully found contact with id ${contactId}!`,
-//     data: contact,
-//   });
-//   console.error(error);
-//   res.status(500).send('Something went wrong');
-// };
-
-export const contactModelsFind = () => {
-  return ContactModels.find();
+  // return ContactModels.find();
 };
 
 export const contactModelsFindById = (contactId) => {

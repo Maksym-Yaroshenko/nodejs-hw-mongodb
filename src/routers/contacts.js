@@ -9,6 +9,9 @@ import {
   patchContactController,
 } from '../controllers/contacts.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
+import { validateBody } from '../middlewares/validateBody.js';
+import { createContactsSchema } from '../validation/contacts.js';
+import { isValidId } from '../middlewares/isValidId.js';
 
 const router = Router();
 
@@ -22,26 +25,36 @@ router.get('/contacts', ctrlWrapper(fullContactsController));
 router.get(
   '/contacts/:contactId',
   jsonParse,
+  isValidId,
   ctrlWrapper(oneContactController),
 );
 
-router.post('/contacts', jsonParse, ctrlWrapper(createContactController));
+router.post(
+  '/contacts',
+  jsonParse,
+  validateBody(createContactsSchema),
+  ctrlWrapper(createContactController),
+);
 
 router.delete(
   '/contacts/:contactId',
   jsonParse,
+  isValidId,
   ctrlWrapper(deleteContactController),
 );
 
 router.put(
   '/contacts/:contactId',
   jsonParse,
+  isValidId,
   ctrlWrapper(putContactController),
 );
 
 router.patch(
   '/contacts/:contactId',
   jsonParse,
+  isValidId,
+  validateBody(createContactsSchema),
   ctrlWrapper(patchContactController),
 );
 
