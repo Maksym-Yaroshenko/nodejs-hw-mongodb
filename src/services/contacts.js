@@ -8,14 +8,14 @@ export const contactModelsFind = async (
   perPage = 10,
   sortOrder = SORT_ORDER.ASD,
   sortBy = '_id',
+  userId,
 ) => {
   const limit = perPage;
   const skip = (page - 1) * perPage;
 
-  const contactsQuery = ContactModels.find();
-
+  const contactsQuery = ContactModels.find({ userId });
   const [contactsCount, contacts] = await Promise.all([
-    ContactModels.countDocuments({}),
+    ContactModels.countDocuments({ userId }),
     contactsQuery
       .skip(skip)
       .limit(limit)
@@ -33,20 +33,20 @@ export const contactModelsFind = async (
   // return ContactModels.find();
 };
 
-export const contactModelsFindById = (contactId) => {
-  return ContactModels.findById(contactId);
+export const contactModelsFindById = (contactId, userId) => {
+  return ContactModels.findOne({ _id: contactId, userId });
 };
 
 export const createContact = (payload, qqq, options = {}) => {
   return ContactModels.create(payload);
 };
 
-export const deleteContact = (contactId) => {
-  return ContactModels.findByIdAndDelete(contactId);
+export const deleteContact = (contactId, userId) => {
+  return ContactModels.findByIdAndDelete({ _id: contactId, userId });
 };
 
-export const updateContact = (contactId, payload, options = {}) => {
-  return ContactModels.findByIdAndUpdate(contactId, payload, {
+export const updateContact = (contactId, userId, payload, options = {}) => {
+  return ContactModels.findByIdAndUpdate({ _id: contactId, userId }, payload, {
     new: true,
     upsert: true,
     includeResultMetadata: true,
@@ -54,8 +54,8 @@ export const updateContact = (contactId, payload, options = {}) => {
   });
 };
 
-export const pumpingWithPatch = (contactId, payload, options = {}) => {
-  return ContactModels.findByIdAndUpdate(contactId, payload, {
+export const pumpingWithPatch = (contactId, userId, payload, options = {}) => {
+  return ContactModels.findByIdAndUpdate({ _id: contactId, userId }, payload, {
     new: true,
     includeResultMetadata: true,
     // versionKey: false,

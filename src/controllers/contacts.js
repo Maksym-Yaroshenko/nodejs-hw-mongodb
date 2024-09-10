@@ -15,8 +15,15 @@ export const fullContactsController = async (req, res, next) => {
   const { page, perPage } = parsePaginationsParams(req.query);
 
   const { sortOrder, sortBy } = parseSortParams(req.query);
+  // console.log(req.user);
 
-  const contacts = await contactModelsFind(page, perPage, sortOrder, sortBy);
+  const contacts = await contactModelsFind(
+    page,
+    perPage,
+    sortOrder,
+    sortBy,
+    req.user._id,
+  );
   // console.log(contacts);
 
   res.send({
@@ -29,10 +36,12 @@ export const fullContactsController = async (req, res, next) => {
 export const oneContactController = async (req, res, next) => {
   const { contactId } = req.params;
 
-  const contact = await contactModelsFindById(contactId);
+  const contact = await contactModelsFindById(contactId, req.user._id);
 
-  if (contact === null) {
-    return next(createHttpError(404, 'Contact not found'));
+  if (!contact || contact.userId.toString() !== req.user._id.toString()) {
+    return next(
+      createHttpError(404, 'Contact not found or you do not have access to it'),
+    );
   }
 
   res.send({
@@ -49,6 +58,7 @@ export const createContactController = async (req, res, next) => {
     email: req.body.email,
     isFavourite: req.body.isFavourite,
     contactType: req.body.contactType,
+    userId: req.user._id,
   };
 
   const createdContact = await createContact(contact);
@@ -62,10 +72,15 @@ export const createContactController = async (req, res, next) => {
 export const deleteContactController = async (req, res, next) => {
   const { contactId } = req.params;
 
-  const deletedContact = await deleteContact(contactId);
+  const deletedContact = await deleteContact(contactId, req.user._id);
 
-  if (deletedContact === null) {
-    return next(createHttpError(404, 'Contact not found'));
+  if (
+    !deletedContact ||
+    deletedContact.userId.toString() !== req.user._id.toString()
+  ) {
+    return next(
+      createHttpError(404, 'Contact not found or you do not have access to it'),
+    );
   }
 
   res.status(204).send();
@@ -84,10 +99,15 @@ export const putContactController = async (req, res, next) => {
     contactType,
   };
 
-  const updatedContact = await updateContact(contactId, contact);
+  const updatedContact = await updateContact(contactId, req.user._id, contact);
 
-  if (updatedContact === null) {
-    return next(createHttpError(404, 'Contact not found'));
+  if (
+    !updatedContact.value ||
+    updatedContact.value.userId.toString() !== req.user._id.toString()
+  ) {
+    return next(
+      createHttpError(404, 'Contact not found or you do not have access to it'),
+    );
   }
 
   // console.log() {
@@ -110,12 +130,20 @@ export const putContactController = async (req, res, next) => {
 export const patchContactController = async (req, res, next) => {
   const { contactId } = req.params;
 
-  const updatedContact = await pumpingWithPatch(contactId, req.body);
+  const updatedContact = await pumpingWithPatch(
+    contactId,
+    req.user._id,
+    req.body,
+  );
 
-  if (updatedContact.value === null) {
-    return next(createHttpError(404, 'Contact not found'));
+  if (
+    !updatedContact.value ||
+    updatedContact.value.userId.toString() !== req.user._id.toString()
+  ) {
+    return next(
+      createHttpError(404, 'Contact not found or you do not have access to it'),
+    );
   }
-
   res.send({
     status: 200,
     message: 'Successfully patched a contact!',

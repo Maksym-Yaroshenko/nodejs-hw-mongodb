@@ -12,6 +12,7 @@ import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import { createContactsSchema } from '../validation/contacts.js';
 import { isValidId } from '../middlewares/isValidId.js';
+import { authenticate } from '../middlewares/authenticate.js';
 
 const router = Router();
 
@@ -20,38 +21,40 @@ const jsonParse = express.json({
   //   limit: '100kb',
 });
 
-router.get('/contacts', ctrlWrapper(fullContactsController));
+router.use(authenticate);
+
+router.get('/', ctrlWrapper(fullContactsController));
 
 router.get(
-  '/contacts/:contactId',
+  '/:contactId',
   jsonParse,
   isValidId,
   ctrlWrapper(oneContactController),
 );
 
 router.post(
-  '/contacts',
+  '/',
   jsonParse,
   validateBody(createContactsSchema),
   ctrlWrapper(createContactController),
 );
 
 router.delete(
-  '/contacts/:contactId',
+  '/:contactId',
   jsonParse,
   isValidId,
   ctrlWrapper(deleteContactController),
 );
 
 router.put(
-  '/contacts/:contactId',
+  '/:contactId',
   jsonParse,
   isValidId,
   ctrlWrapper(putContactController),
 );
 
 router.patch(
-  '/contacts/:contactId',
+  '/:contactId',
   jsonParse,
   isValidId,
   validateBody(createContactsSchema),
