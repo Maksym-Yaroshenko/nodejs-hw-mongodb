@@ -10,6 +10,9 @@ import {
 import createHttpError from 'http-errors';
 import { parsePaginationsParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import { ENV_VARS } from '../constants/index.js';
 
 export const fullContactsController = async (req, res, next) => {
   const { page, perPage } = parsePaginationsParams(req.query);
@@ -24,7 +27,6 @@ export const fullContactsController = async (req, res, next) => {
     sortBy,
     req.user._id,
   );
-  // console.log(contacts);
 
   res.send({
     status: 200,
@@ -52,6 +54,17 @@ export const oneContactController = async (req, res, next) => {
 };
 
 export const createContactController = async (req, res, next) => {
+  const photo = req.file;
+  let photoUrl;
+
+  if (photo) {
+    if (ENV_VARS.ENABLE_CLOUDINARY === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
+
   const contact = {
     name: req.body.name,
     phoneNumber: req.body.phoneNumber,
@@ -59,6 +72,7 @@ export const createContactController = async (req, res, next) => {
     isFavourite: req.body.isFavourite,
     contactType: req.body.contactType,
     userId: req.user._id,
+    photo: photoUrl,
   };
 
   const createdContact = await createContact(contact);
@@ -99,7 +113,24 @@ export const putContactController = async (req, res, next) => {
     contactType,
   };
 
-  const updatedContact = await updateContact(contactId, req.user._id, contact);
+  const photo = req.file;
+
+  let photoUrl;
+
+  if (photo) {
+    if (ENV_VARS.ENABLE_CLOUDINARY === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
+
+  const updatedContact = await updateContact(
+    contactId,
+    req.user._id,
+    contact,
+    photoUrl,
+  );
 
   if (
     !updatedContact.value ||
@@ -129,11 +160,23 @@ export const putContactController = async (req, res, next) => {
 
 export const patchContactController = async (req, res, next) => {
   const { contactId } = req.params;
+  const photo = req.file;
+
+  let photoUrl;
+
+  if (photo) {
+    if (ENV_VARS.ENABLE_CLOUDINARY === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
 
   const updatedContact = await pumpingWithPatch(
     contactId,
     req.user._id,
     req.body,
+    photoUrl,
   );
 
   if (

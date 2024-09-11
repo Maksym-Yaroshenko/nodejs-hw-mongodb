@@ -7,6 +7,7 @@ import { env } from './utils/env.js';
 import router from './routers/index.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
+import { UPLOAD_DIR } from './constants/index.js';
 
 export const setupServer = () => {
   const app = express();
@@ -16,9 +17,11 @@ export const setupServer = () => {
   app.use(
     express.json({
       type: ['application/json', 'application/vnd.api+json'],
-      limit: '100kb',
+      // limit: '100kb',
     }),
   );
+
+  app.use('/uploads', express.static(UPLOAD_DIR));
 
   app.use(cors());
   app.use(cookieParser());

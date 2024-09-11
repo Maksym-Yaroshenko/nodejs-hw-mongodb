@@ -13,6 +13,7 @@ import { validateBody } from '../middlewares/validateBody.js';
 import { createContactsSchema } from '../validation/contacts.js';
 import { isValidId } from '../middlewares/isValidId.js';
 import { authenticate } from '../middlewares/authenticate.js';
+import { upload } from '../middlewares/multer.js';
 
 const router = Router();
 
@@ -35,6 +36,7 @@ router.get(
 router.post(
   '/',
   jsonParse,
+  upload.single('photo'),
   validateBody(createContactsSchema),
   ctrlWrapper(createContactController),
 );
@@ -50,6 +52,7 @@ router.put(
   '/:contactId',
   jsonParse,
   isValidId,
+  upload.single('photo'),
   ctrlWrapper(putContactController),
 );
 
@@ -57,6 +60,7 @@ router.patch(
   '/:contactId',
   jsonParse,
   isValidId,
+  upload.single('photo'),
   validateBody(createContactsSchema),
   ctrlWrapper(patchContactController),
 );

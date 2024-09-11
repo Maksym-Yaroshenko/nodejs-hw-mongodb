@@ -4,6 +4,8 @@ import {
   logoutUser,
   refreshUserSession,
   registerUser,
+  requestResetToken,
+  resetPassword,
 } from '../services/auth.js';
 
 export const registerUserController = async (req, res, next) => {
@@ -67,5 +69,29 @@ export const refreshUserSessionController = async (req, res, next) => {
     data: {
       accessToken: session.accessToken,
     },
+  });
+};
+
+// ===============================================================
+
+export const requestResetEmailController = async (req, res) => {
+  const { email } = req.body;
+  await requestResetToken(email);
+  res.send({
+    status: 200,
+    message: 'Reset password email has been successfully sent.  ',
+    data: {},
+  });
+};
+
+//скинути пароль
+export const resetPasswordController = async (req, res) => {
+  const { password, token } = req.body;
+  await resetPassword(password, token);
+  //res.send('Reset password');
+  res.send({
+    status: 200,
+    message: 'Password has been successfully reset.',
+    data: {}, // даних немає, тому порожній масив
   });
 };

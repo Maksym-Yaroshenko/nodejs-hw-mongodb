@@ -14,6 +14,7 @@ export const contactModelsFind = async (
   const skip = (page - 1) * perPage;
 
   const contactsQuery = ContactModels.find({ userId });
+
   const [contactsCount, contacts] = await Promise.all([
     ContactModels.countDocuments({ userId }),
     contactsQuery
@@ -45,19 +46,42 @@ export const deleteContact = (contactId, userId) => {
   return ContactModels.findByIdAndDelete({ _id: contactId, userId });
 };
 
-export const updateContact = (contactId, userId, payload, options = {}) => {
-  return ContactModels.findByIdAndUpdate({ _id: contactId, userId }, payload, {
-    new: true,
-    upsert: true,
-    includeResultMetadata: true,
-    // versionKey: false,
-  });
+export const updateContact = (
+  contactId,
+  userId,
+  payload,
+  photoUrl,
+  options = {},
+) => {
+  return ContactModels.findByIdAndUpdate(
+    { _id: contactId, userId },
+    {
+      ...payload,
+      photo: photoUrl,
+    },
+    {
+      new: true,
+      upsert: true,
+      includeResultMetadata: true,
+      // versionKey: false,
+    },
+  );
 };
 
-export const pumpingWithPatch = (contactId, userId, payload, options = {}) => {
-  return ContactModels.findByIdAndUpdate({ _id: contactId, userId }, payload, {
-    new: true,
-    includeResultMetadata: true,
-    // versionKey: false,
-  });
+export const pumpingWithPatch = (
+  contactId,
+  userId,
+  payload,
+  photoUrl,
+  options = {},
+) => {
+  return ContactModels.findByIdAndUpdate(
+    { _id: contactId, userId },
+    { ...payload, photo: photoUrl },
+    {
+      new: true,
+      includeResultMetadata: true,
+      // versionKey: false,
+    },
+  );
 };
