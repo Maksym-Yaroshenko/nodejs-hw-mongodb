@@ -13,7 +13,7 @@ import { swaggerDocs } from './middlewares/swaggerDocs.js';
 export const setupServer = () => {
   const app = express();
 
-  const PORT = env('PORT', '3000');
+  const PORT = env('PORT', '4000');
 
   app.use(
     express.json({

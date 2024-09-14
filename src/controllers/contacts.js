@@ -37,8 +37,10 @@ export const fullContactsController = async (req, res, next) => {
 
 export const oneContactController = async (req, res, next) => {
   const { contactId } = req.params;
+  // console.log(req.user);
 
   const contact = await contactModelsFindById(contactId, req.user._id);
+  console.log(contact);
 
   if (!contact || contact.userId.toString() !== req.user._id.toString()) {
     return next(
